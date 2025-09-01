@@ -19,27 +19,6 @@ const Register = () => {
     gender: "",
     terms: true,
   });
-
-  const hasData = (e) => {
-    const { name, value, checked } = e.target;
-
-    let inputVal = value;
-
-    if (name === "terms") {
-      inputVal = checked;
-    }
-
-    let errorMessage = "";
-    if (!inputVal) {
-      if (name === "gender") {
-        errorMessage = `Please select ${name}`;
-      } else {
-        errorMessage = `${name} is Required.`;
-      }
-    }
-    setErrrors({ ...errors, [name]: errorMessage });
-  };
-
   const [errors, setErrrors] = useState({
     firstName: "",
     lastName: "",
@@ -48,18 +27,67 @@ const Register = () => {
     gender: "",
     terms: "",
   });
-
   const handleChange = (e) => {
-    const _ = hasData(e);
+    const _ = handleValidation(e);
     const { name, value, checked } = e.target;
     var inputVal = value;
     if (name === "terms") {
       inputVal = checked;
     }
-
     setFormValues({ ...formValues, [name]: inputVal });
   };
+  const handleValidation = (e) => {
+    const { name, value, checked } = e.target;
+    let inputVal = value;
+    let errorMessage = "";
 
+    if (name === "firstName") {
+      if (!inputVal) {
+        errorMessage = `${name} is Required.`;
+      } else if (!inputVal.match(/^[a-zA-Z]+$/)) {
+        errorMessage = `Only Letter are allowed`;
+      }
+    }
+    if (name === "lastName") {
+      if (!inputVal) {
+        errorMessage = `${name} is Required.`;
+      } else if (!inputVal.match(/^[a-zA-Z]+$/)) {
+        errorMessage = `Only Letter are allowed`;
+      }
+    }
+    if (name === "email") {
+      if (!inputVal) {
+        errorMessage = `${name} is Required.`;
+      } else if (
+        !inputVal
+          .toLowerCase()
+          .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          )
+      ) {
+        errorMessage = `${name} is Invalid.`;
+      }
+    }
+    if (name === "password") {
+      if (!inputVal) {
+        errorMessage = `${name} is Required.`;
+      } else if (!inputVal.match(/^\w{4,}$/)) {
+        errorMessage = `Minimum ${name} length is 4.`;
+      }
+    }
+    if (name === "gender") {
+      if (!inputVal) {
+        errorMessage = `Please select ${name}`;
+      }
+    }
+    if (name === "terms") {
+      inputVal = checked;
+      if (!inputVal) {
+        errorMessage = `${name} are required`;
+      }
+    }
+    setErrrors({ ...errors, [name]: errorMessage });
+  };
   const handleSubmit = () => {
     console.log("submited Data: ", { ...formValues });
   };
