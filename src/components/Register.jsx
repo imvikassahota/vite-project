@@ -19,7 +19,8 @@ const Register = () => {
     gender: "",
     terms: true,
   });
-  const [errors, setErrrors] = useState({
+
+  const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -27,69 +28,131 @@ const Register = () => {
     gender: "",
     terms: "",
   });
-  const handleChange = (e) => {
-    const _ = handleValidation(e);
-    const { name, value, checked } = e.target;
-    var inputVal = value;
-    if (name === "terms") {
+
+  const handleChange = (event) => {
+    // get values from the target
+    const { name, value, checked } = event.target;
+    let inputVal = value; //variable for handle input
+
+    //check input type
+    if ((event, name === "terms")) {
       inputVal = checked;
     }
+
+    //check errors input errors
+    handleValidation(event, name, inputVal);
+
+    //set values in state
     setFormValues({ ...formValues, [name]: inputVal });
   };
-  const handleValidation = (e) => {
-    const { name, value, checked } = e.target;
-    let inputVal = value;
-    let errorMessage = "";
 
-    if (name === "firstName") {
-      if (!inputVal) {
-        errorMessage = `${name} is Required.`;
-      } else if (!inputVal.match(/^[a-zA-Z]+$/)) {
-        errorMessage = `Only Letter are allowed`;
-      }
-    }
-    if (name === "lastName") {
-      if (!inputVal) {
-        errorMessage = `${name} is Required.`;
-      } else if (!inputVal.match(/^[a-zA-Z]+$/)) {
-        errorMessage = `Only Letter are allowed`;
-      }
-    }
-    if (name === "email") {
-      if (!inputVal) {
-        errorMessage = `${name} is Required.`;
-      } else if (
-        !inputVal
-          .toLowerCase()
-          .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          )
-      ) {
-        errorMessage = `${name} is Invalid.`;
-      }
-    }
-    if (name === "password") {
-      if (!inputVal) {
-        errorMessage = `${name} is Required.`;
-      } else if (!inputVal.match(/^\w{4,}$/)) {
-        errorMessage = `Minimum ${name} length is 4.`;
-      }
-    }
-    if (name === "gender") {
-      if (!inputVal) {
-        errorMessage = `Please select ${name}`;
-      }
-    }
-    if (name === "terms") {
-      inputVal = checked;
-      if (!inputVal) {
-        errorMessage = `${name} are required`;
-      }
-    }
-    setErrrors({ ...errors, [name]: errorMessage });
-  };
   const handleSubmit = () => {
-    console.log("submited Data: ", { ...formValues });
+    // declare error object
+    let errorsObj = {};
+
+    // check each field for errors
+    errorsObj.firstName = validateFirstName(formValues.firstName);
+    errorsObj.lastName = validateLastName(formValues.lastName);
+    errorsObj.email = validateEmail(formValues.email);
+    errorsObj.password = validatePassword(formValues.password);
+    errorsObj.gender = validateGender(formValues.gender);
+    errorsObj.terms = validateTerms(formValues.terms);
+    setErrors(errorsObj);
+
+    // check if has any error
+    const hasErrors = Object.values(errors).some((value) => value);
+
+    // show error or proceed further
+    if (hasErrors) {
+      console.log("Form errors:", { ...errors });
+    } else {
+      console.log("Form data:", { ...formValues });
+    }
+  };
+  const handleValidation = (event, name, value) => {
+    let errorMessage = "";
+    switch (name) {
+      case "firstName":
+        errorMessage = validateFirstName(value);
+        break;
+      case "lastName":
+        errorMessage = validateLastName(value);
+        break;
+      case "email":
+        errorMessage = validateEmail(value);
+        break;
+      case "password":
+        errorMessage = validatePassword(value);
+        break;
+      case "gender":
+        errorMessage = validateGender(value);
+        break;
+      case "terms":
+        errorMessage = validateTerms(value);
+        break;
+      default:
+        errorMessage = "";
+        break;
+    }
+    // set errors in state
+    setErrors({ ...errors, [name]: errorMessage });
+  };
+
+  const validateFirstName = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `FirstName is required.`;
+    } else if (!value.match(/^[a-zA-Z]+$/)) {
+      errorMessage = `Only letters are allowed`;
+    }
+    return errorMessage;
+  };
+  const validateLastName = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `LastName field is required.`;
+    } else if (!value.match(/^[a-zA-Z]+$/)) {
+      errorMessage = `Only letters are allowed`;
+    }
+    return errorMessage;
+  };
+  const validateEmail = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `Email is Required.`;
+    } else if (
+      !value
+        .toLowerCase()
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )
+    ) {
+      errorMessage = `Please enter valid Email.`;
+    }
+    return errorMessage;
+  };
+  const validatePassword = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `Password is Required.`;
+    } else if (!value.match(/^\w{4,}$/)) {
+      errorMessage = `Password should be atleast 4 characters long.`;
+    }
+    return errorMessage;
+  };
+  const validateGender = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `Please select Gender.`;
+    }
+    return errorMessage;
+  };
+  const validateTerms = (value) => {
+    let errorMessage = "";
+    if (!value) {
+      errorMessage = `Please agree to terms & conditons.`;
+    }
+    return errorMessage;
   };
 
   return (
@@ -101,6 +164,7 @@ const Register = () => {
           id="firstName"
           type="text"
           name="firstName"
+          placeholder="First Name"
           value={formValues.firstName}
           onChange={handleChange}
         />
@@ -112,6 +176,7 @@ const Register = () => {
           id="lastName"
           type="text"
           name="lastName"
+          placeholder="Last Name"
           value={formValues.lastName}
           onChange={handleChange}
         />
@@ -123,6 +188,7 @@ const Register = () => {
           id="email"
           type="text"
           name="email"
+          placeholder="Email"
           value={formValues.email}
           onChange={handleChange}
         />
@@ -134,6 +200,7 @@ const Register = () => {
           id="password"
           type="password"
           name="password"
+          placeholder="Password"
           value={formValues.password}
           onChange={handleChange}
         />
