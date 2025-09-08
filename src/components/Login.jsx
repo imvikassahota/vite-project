@@ -24,8 +24,8 @@ const Login = () => {
 
   const handleSubmit = () => {
     console.log(formValues);
-    const usertest = 'new user testrole';
-    console.log("testing date with user:",{usertest});
+    const usertest = "new user testrole";
+    console.log("testing date with user:", { usertest });
   };
 
   return (
